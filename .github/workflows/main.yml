@@ -40,51 +40,13 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/frontend-tu:${{ github.ref_name }}
-            ${{ secrets.DOCKER_USERNAME }}/frontend-tu:latest
+            ${{ secrets.DOCKER_USERNAME }}/quackjs-frontend
+           
 
-      - name: Сборка и отправка образа Nginx
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./nginx/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/nginx-tu:latest
+      
 
-  deploy-dev:
-    if: github.ref_name == 'dev'
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Настройка SSH
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-
-      - name: Деплой на DEV сервер
-        run: |
-          ssh -o StrictHostKeyChecking=no user1@${{ secrets.DEV_SERVER_IP }} << 'EOF'
-            set -e
-            echo "✅ Подключение к DEV серверу"
-            cd TU-SQL-dev || exit 1
-
-            echo "📦 Pull образов"
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend-tu:dev
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nginx-tu:latest
-
-            echo "🔁 Обновление контейнеров"
-            sudo docker-compose -f docker-compose.dev.yml pull
-            sudo docker-compose -f docker-compose.dev.yml down -v
-            sudo docker-compose -f docker-compose.dev.yml up -d
-
-            echo "📋 Активные контейнеры:"
-            sudo docker ps
-            echo "✅ Деплой DEV завершён"
-          EOF
-
+  
   deploy-prod-1:
-    if: github.ref_name == 'main'
     needs: build
     runs-on: ubuntu-latest
 
@@ -99,19 +61,11 @@ jobs:
           ssh -o StrictHostKeyChecking=no user1@${{ secrets.PROD_SERVER_IP }} << 'EOF'
             set -e
             echo "✅ Подключение к PROD серверу 1"
-            cd TU-SQL-prod || exit 1
+            cd ??? || exit 1
 
             echo "📦 Pull образов"
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend-tu:main
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nginx-tu:latest
-
-            echo "🔁 Обновление контейнеров"
-            sudo docker-compose -f docker-compose.prod.yml pull
-            sudo docker-compose -f docker-compose.prod.yml down -v
-            sudo docker-compose -f docker-compose.prod.yml up -d
-
-            echo "📋 Активные контейнеры:"
-            sudo docker ps
+            kubectl delete -f quackjs-deployment.yaml -n web
+            kubectl apply -f quackjs-deployment.yaml -n web
             echo "✅ Деплой PROD #1 завершён"
           EOF
 
