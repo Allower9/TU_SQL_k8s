@@ -11,26 +11,25 @@
 <img width="1375" height="715" alt="Снимок экрана 2025-09-25 в 03 03 04" src="https://github.com/user-attachments/assets/fce184bd-75f2-4242-95df-66bf78774ae1" />
 
 
-5. Полный цикл "Выключить-Включить"
+#### Полный цикл "Выключить-Включить"
 Выключаем:
-bash
-# 1. Удаляем приложение из Argo CD
-argocd app delete quackjs-app
+#### 1. Удаляем приложение из Argo CD
+`argocd app delete quackjs-app`
 
-# 2. Останавливаем Argo CD
-kubectl delete namespace argocd
+#### 2. Останавливаем Argo CD
+`kubectl delete namespace argocd`
 
-# 3. Останавливаем port-forward (Ctrl+C)
+#### 3. Останавливаем port-forward (Ctrl+C)
 Включаем через неделю:
-bash
-# 1. Стартуем Argo CD
-kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+#### 1. Стартуем Argo CD
+`kubectl create namespace argocd`
+`kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml`
 
-# 2. Port-forward (в отдельном терминале)
-kubectl port-forward svc/argocd-server -n argocd 8080:443
+#### 2. Port-forward (в отдельном терминале)
+`kubectl port-forward svc/argocd-server -n argocd 8080:443`
 
-# 3. Восстанавливаем приложение
+#### 3. Восстанавливаем приложение
+```
 argocd login localhost:8080
 argocd app create quackjs-app \
   --repo https://github.com/Allower9/TU_SQL_k8s \
@@ -38,6 +37,6 @@ argocd app create quackjs-app \
   --dest-server https://kubernetes.default.svc \
   --dest-namespace web \
   --sync-policy automated
-
-# 4. Синхронизируем (если нужно)
-argocd app sync quackjs-app
+```
+#### 4. Синхронизируем (если нужно)
+`argocd app sync quackjs-app`
